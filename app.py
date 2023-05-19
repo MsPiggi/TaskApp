@@ -39,17 +39,12 @@ def create_todo():
 
 @app.route('/')
 def index():
-  return "das Funktioniert schon mal"
-
-
-""" @app.route('/')
-def index():
   tasks = Task.query.all()
 
   if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
       return jsonify(tasks)
 
-  return render_template('index.html') """
+  return render_template('index.html') 
 
 
 @app.route('/create', methods=['POST'])
