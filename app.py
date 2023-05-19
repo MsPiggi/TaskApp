@@ -39,12 +39,17 @@ def create_todo():
 
 @app.route('/')
 def index():
+  return "das Funktioniert schon mal"
+
+
+""" @app.route('/')
+def index():
   tasks = Task.query.all()
 
   if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
       return jsonify(tasks)
 
-  return render_template('index.html')
+  return render_template('index.html') """
 
 
 @app.route('/create', methods=['POST'])
@@ -79,5 +84,5 @@ def complete_task():
     return jsonify({'result':'OK'}),200 
 
 if __name__ == '__main__':
-  create_database()
+  #create_database()
   app.run()
