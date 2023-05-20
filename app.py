@@ -1,40 +1,21 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask
+from flask import render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from models import db, Task
 from forms import TaskForm
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/example'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://yjtslemzwfespj:ef2c9832eebf12f4d8e0c264c677d2034c435dd3f27ecc6ca6b43426a73750cb@ec2-34-197-91-131.compute-1.amazonaws.com:5432/d28gb5rnh8v90u'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/example'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['DEBUG'] = True  # Disable debugging
+app.config['DEBUG'] = True  # Enable/Disable debugging
 db.init_app(app)
-
-
-
-class Todo(db.Model):
-    __tablename__ = 'todos'
-    id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(), nullable=False)
-
-    def __repr__(self):
-        return f'<ToDo ID: {self.id}, Description: {self.name}>'
 
 
 def create_database():
     with app.app_context():
       db.create_all()
       print("Database created successfully!")
-
-
-@app.route('/todos/create', methods=['POST'])
-def create_todo():
-    description = request.get_json()['description']
-    todo = Todo(description=description)
-    db.session.add(todo)
-    db.session.commit()
-    return jsonify({
-      'description': todo.description
-    })
 
 
 @app.route('/')
@@ -61,6 +42,7 @@ def create_task():
     
     return redirect(url_for('index'))
 
+
 @app.route('/delete', methods=['POST'])
 def delete_task():
     task_id = request.get_json().get('id')
@@ -68,7 +50,8 @@ def delete_task():
     db.session.delete(task)
     db.session.commit()
     return jsonify({'result':'OK'}),200
-    
+
+
 @app.route('/complete', methods=['POST'])
 def complete_task():
     task_id = request.get_json().get('id')
@@ -78,6 +61,7 @@ def complete_task():
     db.session.commit()
     return jsonify({'result':'OK'}),200 
 
+
 if __name__ == '__main__':
-  #create_database()
+  create_database()
   app.run()
