@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from dataclasses import dataclass
 from datetime import datetime
 
+
 db = SQLAlchemy()
 
 
