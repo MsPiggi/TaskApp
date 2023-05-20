@@ -3,14 +3,12 @@ from flask import Flask
 from flask import render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
-db = SQLAlchemy()
-from models import Task
-from forms import TaskForm
+
 
 app = Flask(__name__)
 if 'DATABASE_URL' in os.environ:
     # Heroku database URL
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://yjtslemzwfespj:ef2c9832eebf12f4d8e0c264c677d2034c435dd3f27ecc6ca6b43426a73750cb@ec2-34-197-91-131.compute-1.amazonaws.com:5432/d28gb5rnh8v90u' #os.environ['DATABASE_URL']
 else:
     # Local database URL
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/example'
@@ -21,7 +19,12 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True  # Enable/Disable debugging
 
+
+db = SQLAlchemy()
 db.init_app(app)
+from models import Task
+from forms import TaskForm
+
 
 
 def create_database():
