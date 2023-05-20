@@ -26,7 +26,7 @@ def setup_db(app):
 
 def db_drop_and_create(app):
     with app.app_context():
-        db.drop_all()
+        # db.drop_all()
         db.create_all()
         insert_basic_data()
 
