@@ -2,7 +2,8 @@ import os
 from flask import Flask
 from flask import render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from models import Task, db
+db = SQLAlchemy()
+from models import Task
 from forms import TaskForm
 
 app = Flask(__name__)

@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from dataclasses import dataclass
 from datetime import datetime
+from app import db
 
 
-db = SQLAlchemy()
+
 
 
 @dataclass
