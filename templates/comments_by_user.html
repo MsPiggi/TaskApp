@@ -2,13 +2,6 @@
 
 
 {% block content %}
-<!--     <div id="app">
-      <li v-for=" task, index in tasks"> 
-        {task.user.id} 
-
-      </li>   
-    </div> -->
-
     <div id="app">
         <h1>{ message }</h1>
         <form @submit.prevent="createTask">
@@ -22,28 +15,14 @@
                 </div>
             </div>
         </form>
-        <li v-for=" user, index in users"> 
-            {{user}} 
-    
-        </li>
-
         <div class="mt-5">
-            <div class="card mb-3" v-for="task, index in tasks" :key="index">
+            <div class="card mb-3" v-for="user, index in users" :key="index">
                 <div class="card-body row justify-content-between px-4" @dblclick="completeTask(task)"
                 :class="{'completed':task.completed}">
-                <h5 class="card-title">{ task.title }</h5>
-
+                    { user.username}
                     <button type="submit" class="btn-close" @click="deleteTask(task)"></button>
                 </div>
-               
             </div>
         </div>    
     </div>
-
-
-
-
-
-    {% endblock %}
-
-
+{% endblock %}
