@@ -1,5 +1,6 @@
+from dotenv import load_dotenv
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
@@ -7,13 +8,28 @@ from flask_cors import CORS
 import sqlalchemy
 from models import setup_db, db, Task, User 
 from forms import TaskForm, RegistrationForm, LoginForm
+from flask_migrate import Migrate
 
 
 
 def create_app():
+    load_dotenv()
     app = Flask(__name__)
+    app.config.from_object("config.DevelopmentConfig")
+
+    """   print(app.config["ENV"])
+    if app.config["ENV"] == "production":
+        app.config.from_object("config.ProductionConfig")
+    elif app.config["ENV"] == "develoment":
+        app.config.from_object("config.DevelopmentConfig")
+    elif app.config["ENV"] == "testing":
+        app.config.from_object("config.TestingConfig") """
+    
+    
+    
     bcrypt = Bcrypt(app)
     setup_db(app, bcrypt)
+    migrate = Migrate(app,db)
     CORS(app)
     
 
@@ -39,11 +55,12 @@ def create_app():
     def register():
         form = RegistrationForm()
 
-        if form.validate_on_submit():
+        if form.validate():
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf8')
-            new_user = User(username=form.username.data, password=hashed_password)
+            new_user = User(username=form.username.data, password=hashed_password, email=form.email.data)
             db.session.add(new_user)
             db.session.commit()
+            flash("Der User wurde erfolgreich angelegt")
             return redirect(url_for('login'))
 
 
@@ -87,31 +104,35 @@ def create_app():
     def index():
         tasks = Task.query.all()
         tasks_json = [task.to_json() for task in tasks]  # Convert Task objects to JSON-serializable dictionaries
-        users = User.query.all()
-        users_json = [user.to_json() for user in users]  # Convert Task objects to JSON-serializable dictionaries
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(tasks_json)
         
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify(users_json)
-
         print(tasks_json)
         print(tasks)
-        print(users_json)
-        return render_template('index.html', tasks = tasks_json, users = users_json ) 
+        print(app.config)
+        return render_template('index.html', tasks = tasks_json, user = current_user ) 
     
-    @app.route('/users')
+    @app.route('/users', methods=['POST','GET'])
     @login_required
-    def commentsbyuser():
-        users = User.query.all()
-        users_json = [user.to_json() for user in users]  # Convert Task objects to JSON-serializable dictionaries
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify(users_json)
+    def team():
+        form = RegistrationForm()
+        
+        if form.validate_on_submit():
+            user = User.query.filter_by(username=form.username.data, email=form.email.data).first()
+            if user is None:
+                hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf8')
+                new_user = User(username=form.username.data, password=hashed_password, email=form.email.data)
+                db.session.add(new_user)
+                db.session.commit()
+                flash("Der User wurde erfolgreich angelegt")
+            else:
+                flash("Der User existiert bereits")
 
-        print(users_json)
-        print(users)
-        return render_template('comments_by_user.html') 
+        team = User.query.all()
+        users_json = [user.to_json() for user in team]  # Convert Task objects to JSON-serializable dictionaries
+
+        return render_template('team.html', users=users_json, form=form) 
 
     @app.route('/create', methods=['POST'])
     @login_required
@@ -120,7 +141,7 @@ def create_app():
         form = TaskForm(data=user_input)
         
         # Validate the form
-        if form.validate():
+        if form.validate_on_submit():
             task = Task(title=form.title.data, user_id = current_user.id)
             db.session.add(task)
             db.session.commit()
@@ -173,7 +194,7 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
 
 
   

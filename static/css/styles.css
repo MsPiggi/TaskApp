@@ -1,0 +1,13 @@
+
+.completed {
+    text-decoration: line-through;
+}
+
+h1{
+    color: black;
+    font-size: 60px;
+}
+
+body{
+    background: white;
+}

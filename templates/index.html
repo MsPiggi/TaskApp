@@ -2,48 +2,13 @@
 
 
 {% block content %}
-<!--     <div id="app">
-      <li v-for=" task, index in tasks"> 
-        {task.user.id} 
-
-      </li>   
-    </div> -->
-
-    <div id="app">
-        <h1>{ message }</h1>
-        <form @submit.prevent="createTask">
-            <div class="form-group row">
-                <div class="col-9">
-                    <label for="">Create New Task</label>
-                    <input type="text" class="form-control" v-model="task.title">
-                </div>
-                <div class="col-auto mt-auto">
-                    <button style="background-color: green" button="btn btn-sucess" type="submit">Create</button>
-                </div>
-            </div>
-        </form>
-        <li v-for=" user, index in users"> 
-            {{user}} 
-    
-        </li>
-
-        <div class="mt-5">
-            <div class="card mb-3" v-for="task, index in tasks" :key="index">
-                <div class="card-body row justify-content-between px-4" @dblclick="completeTask(task)"
-                :class="{'completed':task.completed}">
-                <h5 class="card-title">{ task.title }</h5>
-
-                    <button type="submit" class="btn-close" @click="deleteTask(task)"></button>
-                </div>
-               
-            </div>
-        </div>    
-    </div>
+<!-- <img src="{{url_for('static', filename='images/Template-post-social-3.jpg')}}"> -->
+<div>Hallo {{ user.username}} hier sind seine Tasks</div> 
+    {% for task in tasks %}
+        <li>{{task.title}}</li>
+    {% endfor %}
 
 
 
 
-
-    {% endblock %}
-
-
+{% endblock %}

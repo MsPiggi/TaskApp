@@ -1,24 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-        <title>Login</title>
-    </head>
+{% extends 'base_anonymous.html' %}
+
+
+{% block content %}
     <body>
-        
-        <h1>Loging Page</h1>
+        <!-- <img src="{{url_for('static', filename='images/Template-post-social-3.jpg')}}" width=1100> -->
+        <h3>Login Page</h3>
+        <br/>
         <form method="POST" action="">
             {{form.hidden_tag()}}
-            {{form.username}}
-            {{form.password}}
-            {{form.submit}}
+            {{form.username.label(class="form-label")}}
+            {{form.username(class="form-control")}}
+            <br/>
+            {{form.password.label(class="form-label")}}
+            {{form.password(class="form-control")}}
+            <br/>
+            {{form.submit(class="btn btn-secondary")}}
         </form>
-
+        <br/>
         <a href="{{ url_for('register') }}">Are you not registered yet?</a>
 
         <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
     </body>
 </html>
+
+{%endblock%}
