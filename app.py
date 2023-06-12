@@ -72,6 +72,16 @@ def create_app():
     #Website
     ###
 
+    #Jinja2 filters
+    #safe
+    #capitalize
+    #lower
+    #upper
+    #title
+    #trim
+    #striptags
+
+
     @app.route('/')
     @login_required
     def index():
@@ -88,7 +98,8 @@ def create_app():
 
         print(tasks_json)
         print(tasks)
-        return render_template('index.html') 
+        print(users_json)
+        return render_template('index.html', tasks = tasks_json, users = users_json ) 
     
     @app.route('/users')
     @login_required
@@ -141,6 +152,21 @@ def create_app():
         db.session.commit()
         return jsonify({'result':'OK'}),200 
     
+
+    ###
+    #Error Handler 
+    ###
+    
+    #Invalid URL
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template("404.html"), 404
+    
+    #Internal Server Error
+    @app.errorhandler(500)
+    def page_not_found(e):
+        return render_template("404.html"), 500
+
     return app
 
 
