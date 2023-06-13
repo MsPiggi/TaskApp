@@ -13,7 +13,7 @@ def setup_db(app, bcrypt):
 
     if 'DATABASE_URL' in os.environ:
         # Heroku database URL
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://yjtslemzwfespj:ef2c9832eebf12f4d8e0c264c677d2034c435dd3f27ecc6ca6b43426a73750cb@ec2-34-197-91-131.compute-1.amazonaws.com:5432/d28gb5rnh8v90u' #os.environ['DATABASE_URL']
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://edusxtmwaesvuq:6bf5149f2872b3a5b8d50198ea6c00bc5fbef8ccfd8b7598c338765113833ddc@ec2-52-3-81-13.compute-1.amazonaws.com:5432/d3bd4jbu2i4qkt' #os.environ['DATABASE_URL']
     else:
         # Local database URL
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/example'
@@ -21,8 +21,8 @@ def setup_db(app, bcrypt):
 
     #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://yjtslemzwfespj:ef2c9832eebf12f4d8e0c264c677d2034c435dd3f27ecc6ca6b43426a73750cb@ec2-34-197-91-131.compute-1.amazonaws.com:5432/d28gb5rnh8v90u'
     #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/example'
-    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    #app.config['SECRET_KEY'] = 'thisisasecretkey'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'thisisasecretkey'
     #app.config['DEBUG'] = True
     db.app = app
     db.init_app(app)

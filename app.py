@@ -15,7 +15,7 @@ from flask_migrate import Migrate
 def create_app():
     load_dotenv()
     app = Flask(__name__)
-    app.config.from_object("config.DevelopmentConfig")
+    #app.config.from_object("config.DevelopmentConfig")
 
     """   print(app.config["ENV"])
     if app.config["ENV"] == "production":
