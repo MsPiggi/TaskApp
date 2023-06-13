@@ -11,7 +11,7 @@
 
 <h3>Füge einen neuen User hinzu</h3>
 <div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
-    <form method="POST">
+    <form method="POST" action="{{url_for('create_user')}}">
         
         {{form.hidden_tag()}}
         <br/>
@@ -42,10 +42,13 @@
     {% for user in users %}
     <tbody>
         <tr>
-            <th scope="row">{{user.id}}</th>
-            <td>{{user.username|title}}</td>
-            <td>{{user.email}}</td>
-          </tr>
+          <th scope="row">{{user.id}}</th>
+          <td>{{user.username|title}}</td>
+          <td>{{user.email}}</td>
+          <td>
+            <a href="{{url_for('delete_user', id=user.id)}}">Löschen</a>
+          </td>
+        </tr>
     </tbody>
     {% endfor %}
 </table>

@@ -1,10 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import Form, StringField, PasswordField, SubmitField
+from wtforms import Form, StringField, PasswordField, SubmitField, DateField
 from wtforms.validators import InputRequired, Length, ValidationError, DataRequired
 from models import User
 
-class TaskForm(Form):
-    title = StringField('title', validators=[DataRequired()])
+class TaskForm(FlaskForm):
+    title = StringField('Aufgabe', validators=[DataRequired()], render_kw={'placeholder':'To Do'})
+    due_to = DateField('Fällig am')
+    submit = SubmitField('Neues Todo')
 
     
 

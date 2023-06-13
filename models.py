@@ -8,9 +8,9 @@ from flask_migrate import Migrate
 
 db = SQLAlchemy()
 
-
-
 def setup_db(app, bcrypt):
+    migrate = Migrate(app,db)
+
     if 'DATABASE_URL' in os.environ:
         # Heroku database URL
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://yjtslemzwfespj:ef2c9832eebf12f4d8e0c264c677d2034c435dd3f27ecc6ca6b43426a73750cb@ec2-34-197-91-131.compute-1.amazonaws.com:5432/d28gb5rnh8v90u' #os.environ['DATABASE_URL']
@@ -28,14 +28,14 @@ def setup_db(app, bcrypt):
     db.init_app(app)
     
     
-    db_drop_and_create(app, bcrypt)
+    #db_drop_and_create(app, bcrypt)
     
 
-def db_drop_and_create(app, bcrypt):
-    with app.app_context():
+#def db_drop_and_create(app, bcrypt):
+    #with app.app_context():
         # db.drop_all()
-        db.create_all()
-        insert_basic_data(bcrypt)
+        #db.create_all()
+        #insert_basic_data(bcrypt)
 
 
 def insert_basic_data(bcrypt):
@@ -70,8 +70,6 @@ def insert_basic_data(bcrypt):
 
             db.session.commit()
     
-    
-        
 
 class User(UserMixin, db.Model):
     id: int
@@ -86,7 +84,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(240), nullable=False)
-    tasks = db.relationship('Task', backref='user', lazy=True)
+    tasks = db.relationship('Task', backref='user')
 
     def __init__(self, username, password, email):
         self.username = username
@@ -111,8 +109,6 @@ class User(UserMixin, db.Model):
     def is_anonymous(self):
         return False          
 
-    
-
 
 class Task(db.Model):
 
@@ -126,20 +122,22 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255))
     date = db.Column(db.DateTime(), default=datetime.now())
+    due_to = db.Column(db.DateTime())
     completed = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
         
-    def to_json(self):
+    """ def to_json(self):
         return {
             "id":self.id,
             "title": self.title,
             "date": self.date.isoformat(),
             "completed": self.completed,
-            "user_id": self.user_id
-        }
+            "user_id": self.user_id,
+            "due_to": self.date.isoformat(),
+        } """
 
     def __repr__(self):
         return f'<Task id: {self.id} - {self.title}>'

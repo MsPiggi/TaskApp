@@ -3,12 +3,55 @@
 
 {% block content %}
 <!-- <img src="{{url_for('static', filename='images/Template-post-social-3.jpg')}}"> -->
-<div>Hallo {{ user.username}} hier sind seine Tasks</div> 
+
+    
+<div>Füge neue Todos hinzu</div>
+<div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+    <form method="POST" action="{{url_for('create_task')}}">
+        
+        {{form.hidden_tag()}}
+        <br/>
+        {{form.title.label(class="form-label")}}
+        {{form.title(class="form-control")}}
+        <br/>
+        {{form.due_to.label(class="form-label")}}
+        {{form.due_to(class="form-control")}}
+
+        <br/>
+        {{form.submit(class="btn btn-secondary")}}
+        
+    </form>
+</div>
+
+
+
+
+<h3>Todo Liste</h3>
+<table class="table table-hover table-bordered table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Aufgabe</th>
+        <th scope="col">User</th>
+        <th scope="col">Fällig am</th>
+        <th scope="col">Gurke</th>
+      </tr>
+    </thead>
     {% for task in tasks %}
-        <li>{{task.title}}</li>
+    <tbody>
+        <tr>
+          <th scope="row">{{task.id}}</th>
+          <td>{{task.title}}</td>
+          <td>{{task.user_id}}</td>
+          <td>{{task.due_to}}</td>
+          <td>{{task.user.username}}</td>
+          <td>
+            <!-- <a href="{{url_for('delete_user', id=user.id)}}">Löschen</a> -->
+          </td>
+        </tr>
+    </tbody>
     {% endfor %}
-
-
+</table>
 
 
 {% endblock %}

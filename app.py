@@ -29,7 +29,6 @@ def create_app():
     
     bcrypt = Bcrypt(app)
     setup_db(app, bcrypt)
-    migrate = Migrate(app,db)
     CORS(app)
     
 
@@ -43,7 +42,7 @@ def create_app():
             print("Database created successfully!") """
 
     ###
-    #AUTHENTICATION
+    #AUTHENTICATION & USER & TEAM
     ###
 
     @login_manager.user_loader
@@ -66,6 +65,7 @@ def create_app():
 
         return render_template('register.html', form=form) 
     
+
     @app.route('/login', methods=['GET','POST'])
     def login():
         form = LoginForm()
@@ -78,6 +78,7 @@ def create_app():
         
         return render_template('login.html', form=form) 
     
+
     @app.route('/logout', methods=['GET','POST'])
     @login_required
     def logout():
@@ -85,37 +86,32 @@ def create_app():
         return redirect(url_for('login'))
 
 
-    ###
-    #Website
-    ###
-
-    #Jinja2 filters
-    #safe
-    #capitalize
-    #lower
-    #upper
-    #title
-    #trim
-    #striptags
-
-
-    @app.route('/')
+    @app.route('/users/delete/<int:id>', methods=['GET'])
     @login_required
-    def index():
-        tasks = Task.query.all()
-        tasks_json = [task.to_json() for task in tasks]  # Convert Task objects to JSON-serializable dictionaries
+    def delete_user(id):
+        user_to_delete = User.query.get_or_404(id)
+        print(user_to_delete)
+        form = RegistrationForm()
 
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify(tasks_json)
+        try:
+            db.session.delete(user_to_delete)
+            db.session.commit()
+            flash("User erfolgreich gelöscht")
+            
+            team = User.query.all()
+            users_json = [user.to_json() for user in team]  # Convert Task objects to JSON-serializable dictionaries
+            return render_template('team.html', users=users_json, form=form) 
         
-        print(tasks_json)
-        print(tasks)
-        print(app.config)
-        return render_template('index.html', tasks = tasks_json, user = current_user ) 
-    
-    @app.route('/users', methods=['POST','GET'])
+        except:
+            flash("Es gab ein Problem beim löschen")
+            team = User.query.all()
+            users_json = [user.to_json() for user in team]  # Convert Task objects to JSON-serializable dictionaries
+            return render_template('team.html', users=users_json, form=form) 
+
+
+    @app.route('/users/create', methods=['POST','GET'])
     @login_required
-    def team():
+    def create_user():
         form = RegistrationForm()
         
         if form.validate_on_submit():
@@ -131,28 +127,57 @@ def create_app():
 
         team = User.query.all()
         users_json = [user.to_json() for user in team]  # Convert Task objects to JSON-serializable dictionaries
-
         return render_template('team.html', users=users_json, form=form) 
+    
 
-    @app.route('/create', methods=['POST'])
+    @app.route('/users', methods=['POST','GET'])
+    @login_required
+    def team():
+        form = RegistrationForm()
+        team = User.query.all()
+        users_json = [user.to_json() for user in team]  # Convert Task objects to JSON-serializable dictionaries
+        return render_template('team.html', users=users_json, form=form) 
+    
+    ###
+    #TASK
+    ###
+
+    @app.route('/')
+    @login_required
+    def index():
+        form = TaskForm()
+        tasks = Task.query.all()
+        #tasks_json = [task.to_json() for task in tasks]  # Convert Task objects to JSON-serializable dictionaries
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify(tasks)
+        
+        
+        print(tasks)
+        print(app.config)
+        return render_template('index.html', tasks = tasks, user = current_user, form = form ) 
+    
+
+    @app.route('/task/create', methods=['POST'])
     @login_required
     def create_task():
-        user_input = request.get_json()
-        form = TaskForm(data=user_input)
+        form = TaskForm()
         
         # Validate the form
         if form.validate_on_submit():
-            task = Task(title=form.title.data, user_id = current_user.id)
+            task = Task(title=form.title.data, due_to = form.due_to.data, user_id = current_user.id)
+            print(task)
             db.session.add(task)
             db.session.commit()
-            return jsonify(task.to_json())
         
-        return redirect(url_for('index'))
+        tasks = Task.query.all()
+        tasks_json = [task.to_json() for task in tasks]  # Convert Task objects to JSON-serializable dictionaries
+        return render_template('index.html', tasks = tasks_json, user = current_user, form = form ) 
 
 
-    @app.route('/delete', methods=['POST'])
+    @app.route('/task/delete/<int:id>', methods=['POST'])
     @login_required
-    def delete_task():
+    def delete_task(id):
         task_id = request.get_json().get('id')
         task = Task.query.filter_by(id=task_id).first()
         db.session.delete(task)
@@ -160,7 +185,7 @@ def create_app():
         return jsonify({'result':'OK'}),200
 
 
-    @app.route('/complete', methods=['POST'])
+    @app.route('/task/complete', methods=['POST'])
     @login_required
     def complete_task():
         task_id = request.get_json().get('id')
@@ -198,3 +223,11 @@ if __name__ == '__main__':
 
 
   
+  #Jinja2 filters
+    #safe
+    #capitalize
+    #lower
+    #upper
+    #title
+    #trim
+    #striptags
