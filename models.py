@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from dataclasses import dataclass
 from datetime import datetime
 from flask_migrate import Migrate
+from collections import Counter
+
 
 
 db = SQLAlchemy()
@@ -90,11 +92,7 @@ class User(UserMixin, db.Model):
         self.username = username
         self.password = password
         self.email = email
-   
 
-    def get_id(self):
-        return str(self.id)
-    
     def to_json(self):        
         return {"id": self.id,
                 "username": self.username,
@@ -107,7 +105,12 @@ class User(UserMixin, db.Model):
         return True           
 
     def is_anonymous(self):
-        return False          
+        return False     
+
+    @classmethod
+    def get_all_usernames(cls):
+        usernames = [user.username for user in cls.query.all()]
+        return usernames    
 
 
 class Task(db.Model):
@@ -124,12 +127,13 @@ class Task(db.Model):
     date = db.Column(db.DateTime(), default=datetime.now())
     due_to = db.Column(db.DateTime())
     completed = db.Column(db.Boolean, default=False)
+    gurki = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
         
-    """ def to_json(self):
+    def to_json(self):
         return {
             "id":self.id,
             "title": self.title,
@@ -137,8 +141,51 @@ class Task(db.Model):
             "completed": self.completed,
             "user_id": self.user_id,
             "due_to": self.date.isoformat(),
-        } """
+        } 
 
     def __repr__(self):
         return f'<Task id: {self.id} - {self.title}>'
+    
+    @classmethod
+    def get_tasks(cls, user_id=None):
+        query = cls.query
+        if user_id is not None:
+            query = query.filter_by(user_id=user_id)
+        return query.all()
+    
+    @classmethod
+    def get_assigned_tasks(cls, username):
+        query = cls.query.filter_by(gurki=username)
+        return query.all()
+    
+    @classmethod
+    def get_open_tasks(cls, user_id=None):
+        query = cls.query.filter_by(completed=False)
+        if user_id is not None:
+            query = query.filter_by(user_id=user_id)
+        return query.all()
 
+    @classmethod
+    def get_completed_tasks(cls, user_id=None):
+        query = cls.query.filter_by(completed=True)
+        if user_id is not None:
+            query = query.filter_by(user_id=user_id)
+        return query.all()
+    
+    @classmethod
+    def get_favourite_gurki(cls, user_id):
+        gurki_counter = Counter()
+
+        tasks = cls.query.filter_by(user_id=user_id).all()
+        for task in tasks:
+            gurki_counter[task.gurki] += 1
+
+        if gurki_counter:
+            most_assigned_gurki = gurki_counter.most_common(1)[0][0]
+            return most_assigned_gurki
+        else:
+            return None
+        
+    @classmethod
+    def get_user_stats(cls, user_id):
+        return None

@@ -15,6 +15,7 @@ from flask_migrate import Migrate
 def create_app():
     load_dotenv()
     app = Flask(__name__)
+    
     #app.config.from_object("config.DevelopmentConfig")
 
     """   print(app.config["ENV"])
@@ -42,7 +43,7 @@ def create_app():
             print("Database created successfully!") """
 
     ###
-    #AUTHENTICATION & USER & TEAM
+    #AUTHENTICATION
     ###
 
     @login_manager.user_loader
@@ -85,6 +86,9 @@ def create_app():
         logout_user()
         return redirect(url_for('login'))
 
+    ###
+    #Team
+    ###
 
     @app.route('/users/delete/<int:id>', methods=['GET'])
     @login_required
@@ -139,6 +143,31 @@ def create_app():
         return render_template('team.html', users=users_json, form=form) 
     
     ###
+    #User Profile
+    ###
+
+    @app.route('/user', methods=['POST','GET'])
+    @login_required
+    def user_profile():
+        username = User.query.filter_by(id=current_user.id).first().to_json().get('username')
+        assigned_tasks = Task.get_assigned_tasks(username)
+        favourite_gurki = Task.get_favourite_gurki(current_user.id)
+        ammount_open_user_tasks = len(Task.get_open_tasks(current_user.id))
+        ammount_completed_user_tasks = len(Task.get_completed_tasks(current_user.id))
+
+        """ ammount_open_user_tasks = len(user_tasks.filter(completed=False))
+        ammount_completed_user_tasks = len(user_tasks.filter(completed=True)) """
+        return render_template('user_profile.html', 
+                               user=current_user, 
+                               tasks = assigned_tasks,
+                               ammount_open_user_tasks = ammount_open_user_tasks,
+                               ammount_completed_user_tasks = ammount_completed_user_tasks,
+                               favourite_gurki = favourite_gurki
+                               ) 
+
+
+
+    ###
     #TASK
     ###
 
@@ -146,36 +175,42 @@ def create_app():
     @login_required
     def index():
         form = TaskForm()
+        team = User.query.all()
+        form.gurki.choices = [user.to_json().get('username') for user in team]
         tasks = Task.query.all()
         #tasks_json = [task.to_json() for task in tasks]  # Convert Task objects to JSON-serializable dictionaries
-
+        users = User.query.all()
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify(tasks)
         
         
         print(tasks)
         print(app.config)
-        return render_template('index.html', tasks = tasks, user = current_user, form = form ) 
+        return render_template('index.html', tasks = tasks, user = current_user, users = users, form = form ) 
     
 
     @app.route('/task/create', methods=['POST'])
     @login_required
     def create_task():
         form = TaskForm()
-        
+        team = User.query.all()
+        form.gurki.choices = [user.to_json().get('username') for user in team]
         # Validate the form
         if form.validate_on_submit():
-            task = Task(title=form.title.data, due_to = form.due_to.data, user_id = current_user.id)
-            print(task)
+            task = Task(title=form.title.data, due_to = form.due_to.data, user_id = current_user.id, gurki = form.gurki.data)
             db.session.add(task)
             db.session.commit()
+            form.title.data = ''
+            form.due_to.data = ''
+            form.gurki.data = ''
+
         
         tasks = Task.query.all()
-        tasks_json = [task.to_json() for task in tasks]  # Convert Task objects to JSON-serializable dictionaries
-        return render_template('index.html', tasks = tasks_json, user = current_user, form = form ) 
+
+        return render_template('index.html', tasks = tasks, user = current_user, form = form ) 
 
 
-    @app.route('/task/delete/<int:id>', methods=['POST'])
+    @app.route('/task/delete/<int:id>', methods=['GET','POST'])
     @login_required
     def delete_task(id):
         task_id = request.get_json().get('id')

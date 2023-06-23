@@ -1,12 +1,17 @@
-from flask_wtf import FlaskForm
-from wtforms import Form, StringField, PasswordField, SubmitField, DateField
-from wtforms.validators import InputRequired, Length, ValidationError, DataRequired
 from models import User
+from flask_wtf import FlaskForm
+from wtforms import Form, StringField, PasswordField, SubmitField, DateField, SelectField
+from wtforms.validators import InputRequired, Length, ValidationError, DataRequired
+
+
 
 class TaskForm(FlaskForm):
     title = StringField('Aufgabe', validators=[DataRequired()], render_kw={'placeholder':'To Do'})
     due_to = DateField('Fällig am')
+    gurki = SelectField('Gurki', choices = [], validators=[DataRequired()])
     submit = SubmitField('Neues Todo')
+    
+        
 
     
 

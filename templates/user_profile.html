@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<br/>
+<div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+    Moin {{current_user.username}}
+    <br/>
+    <strong> Email: </strong>
+    {{current_user.email}} <br/>
+
+    <strong> Gurkenpunkte: </strong>
+    {{ammount_completed_user_tasks}}  <br/>
+    
+    <strong> Offene Todos: </strong>
+    {{ammount_open_user_tasks}}<br/>
+    
+    <strong> Lieblingsgurke: </strong>
+    {{favourite_gurki}}<br/>
+    
+</div>
+
+<h3>Deine Todo Liste</h3>
+
+
+{% for task in tasks %}
+<br/>
+<div class="card" >
+  <div class="row g-0">
+  <div class="card-body"> 
+    <div class="col-md-4">
+      <h5 class="card-title">Für {{task.user.username}} fällig zum {{task.due_to.strftime('%d.%m.%Y')}}</h5>
+      <h6 class="card-subtitle mb-2 text-body-secondary">von {{task.user.username}}</h6>
+      <p class="card-text">{{task.title}}</p>
+    </div>
+    <div class="col-md-9">
+      <a href="#" class="card-link">Gurki-Win</a>
+      <a href="#" class="card-link">Gurki-Fail</a>
+      <a href="#" class="card-link">Bearbeiten</a>
+      <a href="#" class="card-link">Löschen</a>
+    </div>
+  </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

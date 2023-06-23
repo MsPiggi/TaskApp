@@ -18,6 +18,10 @@
         {{form.due_to(class="form-control")}}
 
         <br/>
+        
+        Für welchen Gurki:
+        {{form.gurki(class="form-select")}}
+        <br/>
         {{form.submit(class="btn btn-secondary")}}
         
     </form>
@@ -27,31 +31,30 @@
 
 
 <h3>Todo Liste</h3>
-<table class="table table-hover table-bordered table-striped">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Aufgabe</th>
-        <th scope="col">User</th>
-        <th scope="col">Fällig am</th>
-        <th scope="col">Gurke</th>
-      </tr>
-    </thead>
-    {% for task in tasks %}
-    <tbody>
-        <tr>
-          <th scope="row">{{task.id}}</th>
-          <td>{{task.title}}</td>
-          <td>{{task.user_id}}</td>
-          <td>{{task.due_to}}</td>
-          <td>{{task.user.username}}</td>
-          <td>
-            <!-- <a href="{{url_for('delete_user', id=user.id)}}">Löschen</a> -->
-          </td>
-        </tr>
-    </tbody>
-    {% endfor %}
-</table>
+
+
+{% for task in tasks %}
+<br/>
+<div class="card" >
+  <div class="row g-0">
+  <div class="card-body"> 
+    <div class="col-md-4">
+      <h5 class="card-title">Für {{task.gurki}} fällig zum {{task.due_to.strftime('%d.%m.%Y')}}</h5>
+      <h6 class="card-subtitle mb-2 text-body-secondary">von {{task.user.username}}</h6>
+      <p class="card-text">{{task.title}}</p>
+    </div>
+    <div class="col-md-9" >
+      <a href="#" class="card-link">Gurki-Win</a>
+      <a href="#" class="card-link">Gurki-Fail</a>
+      <a href="#" class="card-link">Bearbeiten</a>
+      <a href="{{url_for('delete_task', id = task.id)}}" class="card-link" >Löschen</a>
+    </div>
+  </div>
+  </div>
+</div>
+{% endfor %}
+
+ 
 
 
 {% endblock %}
